@@ -15,5 +15,12 @@ for line in lines:
         src_ip, dst_ip, proto, port = match.groups()
         log_entries.append((src_ip, dst_ip, proto, port))
 
-print(log_entries[:])  # test 
+
+port_scans = defaultdict(set)
+for src, dst, proto, port in log_entries:
+    port_scans[src].add(port) # a chaque fois qu'on trouve un port pour la meme ip on l'ajoute
+
+# si il ya plus que 20 port scanner dans une courte periode pur le meme ip alors il peut etre malicieux 
+suspicious_ips = [ip for ip, ports in port_scans.items() if len(ports) > 20]
+print("potential port scanners:", suspicious_ips)
 
