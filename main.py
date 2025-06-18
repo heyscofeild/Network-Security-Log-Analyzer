@@ -1,6 +1,7 @@
 import re
 
-from collections import defaultdict
+from collections import defaultdict, Counter
+
 
 logfile = "ufwlog.txt"
 with open(logfile, "r") as f:
@@ -22,5 +23,14 @@ for src, dst, proto, port in log_entries:
 
 # si il ya plus que 20 port scanner dans une courte periode pur le meme ip alors il peut etre malicieux 
 suspicious_ips = [ip for ip, ports in port_scans.items() if len(ports) > 20]
-print("potential port scanners:", suspicious_ips)
+#print("potential port scanners:", suspicious_ips)
+
+
+attempts = Counter()
+for src,dst,proto,port in log_entries:
+    attempts[(src,dst)]+=1  #pour  cahque tentative on incremente le compteur  
+
+for (src,dst),count in attempts.items():
+    if count> 15: #15 juste pour tester mais dans le cas reel on va metere 50 par exemple
+        print(f"{src} trierd to connect to {dst}, {count} times")
 
